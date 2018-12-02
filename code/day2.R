@@ -29,8 +29,10 @@ repeats$n_n[2] * repeats$n_n[3]
 
 # Part 2
 
+# which entries differ by just a single character?
+
 # function takes two vectors, compares to see if they meet answer condition
-# if yes, prints answer
+# if yes, prints answer (the common letters)
 reveal_answer <- function(x, y){
   if(
     sum(x == y) == (length(x) - 1)
