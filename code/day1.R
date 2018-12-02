@@ -30,3 +30,14 @@ while(!done){
 }
 
 first(dupes)
+
+
+# A solution I thought of later - no need for a loop since
+# the answer doesn't ask how many iterations it took
+
+x %>%
+  rep(1000) %>% # probably excessive but the calculations are fast
+  cumsum %>%
+  .[duplicated(.)] %>% # ugly but I can't stop piping
+  unique() %>%
+  first
