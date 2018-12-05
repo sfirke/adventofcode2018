@@ -10,7 +10,7 @@ zap_recursive <- function(tx){
     paste0(LETTERS, letters)
   )
   res <- str_replace_all(tx, targets, "")
-  ifelse(n_distinct(nchar(res)) == 1,
+  ifelse(all(nchar(res) == nchar(tx)),
          res,
          zap_recursive(res[which.min(nchar(str_replace_all(tx, targets, "")))])
   )
@@ -22,17 +22,29 @@ tx <- read_csv("data/day5.txt", col_names = "dat")
 nchar(zap_recursive(tx$dat))
 
 # Part 2
-# What's the best reduction possible after removing aA or bB etc.
+# What's the best reduction possible after removing a and A or b and B or c and C etc.
 
 # I had this all set up with map(), but my memory-hogging approach causes stack overflow
-# So running it as a loop :-(  Leaving the map code on a list of 1 for demonstration sake
+# Update: I tried converting from a list to a loop and the problem isn't the list, it's that an individual case - replacing "h" - causes the recursive function to exceed memory, going too deep / too many reduction cycles
+# So I have to convert it to a loop :-(  How inelegant.
+# At least I got to go back to a purrr list!
 
-ans <- 100000
-for(i in letters[8]){
-  x <- tx$dat %>%
-    map2(., i, function(x, y) gsub(y, "", x, ignore.case = TRUE)) %>%
-    map(zap_recursive) %>%
-    map_int(nchar)
-  print(x)
+zap_loop <- function(tx){
+  all_same <- FALSE
+  targets <- c(
+    paste0(letters, LETTERS),
+    paste0(LETTERS, letters)
+  )
+  while(!all_same){
+    res <- str_replace_all(tx, targets, "")
+    all_same <- (n_distinct(nchar(res)) == 1)
+    tx <- res[which.min(nchar(str_replace_all(tx, targets, "")))]
+  }
+  nchar(res)[1]
 }
-ans
+
+
+tx$dat %>%
+  map2(., letters, function(x, y) gsub(y, "", x, ignore.case = TRUE)) %>%
+  map_int(zap_loop) %>%
+  min
