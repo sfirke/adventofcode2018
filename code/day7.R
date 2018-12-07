@@ -95,8 +95,9 @@ for(i in 1:1100){
         filter(!prereq_step == next_letter)
     }
     worker_avail[sec:(sec+duration)] <- worker_avail[sec:(sec+duration)] - 1
-   # logging[sec:(sec+duration)] <- paste0(logging[sec:(sec+duration)], next_letter, collapse = "") 
-    logging <- c(logging, sec)
+
+    # for exploring behavior and eventually locating an off-by-two error in Excel
+        logging <- c(logging, sec)
     logging2 <- c(logging2, next_letter)
     
   # Reloop with no time penalty if needed, to allow for multiple assignments in one second
@@ -118,4 +119,6 @@ cbind(logging, logging2) %>% View
 # Looks like O starts at 1084... 
 which(LETTERS == "O")+60+1084 # 1159 is "not right", nor is 1158
 
+
+# Not sure why mine gets off by 1 up front, but the other off by 1 is b/c R is counting from second 1 while the puzzle starts at second 0
 
