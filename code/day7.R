@@ -10,6 +10,7 @@ dat <- read_delim("data/day7.txt", delim = " ", col_names = FALSE) %>%
   select(prereq_step = X2, step = X8)
 
 remaining_steps <- unique(c(dat$step, dat$prereq_step))
+step_set <- remaining_steps
 
 ## Psuedocode:
 # ID and log alphabetically-first step with no pre-reqs
@@ -58,13 +59,15 @@ paste(ans, collapse = "")
 
 
 dat <- read_delim("data/day7.txt", delim = " ", col_names = FALSE) %>%
-  select(prereq_step = X2, step = X8)
+  select(prereq_step = X2, step = X8) %>%
+  bind_rows(.,
+          data.frame(prereq_step = "O", step = "dummy"))
 
 remaining_steps <- unique(c(dat$step, dat$prereq_step))
 
 # overload original function
 # now takes the set of steps, returns vector of available letters
-avail_letters <- function(x){
+get_avail_letters <- function(x){
   sort(unique(c(x$step, x$prereq_step))[!unique(c(x$step, x$prereq_step)) %in% x$step])
 }
 
@@ -72,43 +75,47 @@ avail_letters <- function(x){
 sec <- 1
 worker_avail <- rep(4, 2000) # a single worker can do it in less than 2000 secs
 steps_complete <- purrr::map(seq_len(2000), ~dat)
-current_letters <- "ZZZ"
+assigned_letters <- "ZZZ"
+
+logging <- integer(0)
+logging2 <- character(0)
+
 #while(){
-for(i in 1:200){
-  print(sec)
-  print(next_letter)
-  avail_letters <- get_next_step_to_build(steps_complete[[sec]]) 
-  next_letter <- first(avail_letters[!avail_letters %in% current_letters])
-  
-  if(worker_avail[sec] > 0 & !is.na(next_letter)){
-    current_letters <- c(current_letters, next_letter)
+for(i in 1:1100){
+  if(worker_avail[sec] > 0){
+  availables <- get_avail_letters(steps_complete[[sec]]) 
+  if(any(!availables %in% assigned_letters)){
+    next_letter <- first(availables[!availables %in% assigned_letters])
+    assigned_letters <- c(assigned_letters, next_letter)
+
+    duration <- 60+which(LETTERS == next_letter)
     # remove future completions of this letter
-    for(k in (sec+60+which(LETTERS == next_letter)):length(steps_complete)){
+    for(k in (sec+duration):length(steps_complete)){
       steps_complete[[k]] <- steps_complete[[k]] %>%
         filter(!prereq_step == next_letter)
     }
-    worker_avail[sec:(sec+60+which(LETTERS == next_letter))] <- worker_avail[sec:(sec+60+which(LETTERS == next_letter))] - 1
+    worker_avail[sec:(sec+duration)] <- worker_avail[sec:(sec+duration)] - 1
+   # logging[sec:(sec+duration)] <- paste0(logging[sec:(sec+duration)], next_letter, collapse = "") 
+    logging <- c(logging, sec)
+    logging2 <- c(logging2, next_letter)
+    
+  # Reloop with no time penalty if needed, to allow for multiple assignments in one second
+  if(any(!availables %in% assigned_letters) & worker_avail[sec] > 0){
+    sec <- sec - 1
+  }
+  }
   }
   sec <- sec + 1
-  print(sec)
+
 }
 
+# Use this to debug + mock up in Excel, since the order and durations are correct.
+cbind(logging, logging2) %>% View
+
+## Bad guesses:
+
+# 1086 was too low... off by one?  No, looking back at example I also see I should have workers going immediately on all 4 
+# Looks like O starts at 1084... 
+which(LETTERS == "O")+60+1084 # 1159 is "not right", nor is 1158
 
 
-
-
-
-
-
-
-# Examine worker loads, at 1838 they all go to 4, after J is built
-# But that still leaves O to build
-
-
-# Guessed this, it was "too high"
-which(LETTERS == "O")+60+1838
-## Off by one?
-which(LETTERS == "O")+60+1837
-## Nah 1912 was too high also
-
-# 1086 was too high... off by one?  No, looking back at example I also see I should have workers going immediately on all 4 
