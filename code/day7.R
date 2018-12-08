@@ -81,7 +81,7 @@ logging <- integer(0)
 logging2 <- character(0)
 
 #while(){
-for(i in 1:1100){
+for(i in 1:1300){
   if(worker_avail[sec] > 0){
   availables <- get_avail_letters(steps_complete[[sec]]) 
   if(any(!availables %in% assigned_letters)){
@@ -94,7 +94,7 @@ for(i in 1:1100){
       steps_complete[[k]] <- steps_complete[[k]] %>%
         filter(!prereq_step == next_letter)
     }
-    worker_avail[sec:(sec+duration)] <- worker_avail[sec:(sec+duration)] - 1
+    worker_avail[sec:(sec+duration-1)] <- worker_avail[sec:(sec+duration-1)] - 1
 
     # for exploring behavior and eventually locating an off-by-two error in Excel
         logging <- c(logging, sec)
@@ -113,12 +113,7 @@ for(i in 1:1100){
 # Use this to debug + mock up in Excel, since the order and durations are correct.
 cbind(logging, logging2) %>% View
 
-## Bad guesses:
-
-# 1086 was too low... off by one?  No, looking back at example I also see I should have workers going immediately on all 4 
-# Looks like O starts at 1084... 
-which(LETTERS == "O")+60+1084 # 1159 is "not right", nor is 1158
-
-
-# Not sure why mine gets off by 1 up front, but the other off by 1 is b/c R is counting from second 1 while the puzzle starts at second 0
-
+# And the actual real solution
+max(logging)+
+  60 +
+  which(LETTERS == "O") - 1 # minus one b/c my code starts at second 1, not second zero
