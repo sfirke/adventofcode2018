@@ -1,5 +1,5 @@
 library(pacman)
-p_load(stringr, dplyr)
+p_load(readr, dplyr)
 
 practice <- "2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2"
 practice <- as.numeric(strsplit(practice, " ")[[1]])
@@ -35,11 +35,17 @@ sum_metas <- function(x){
 }
 
 # Find first zero
-# Decrement number two places in front, increment number one place in front, run zero_trimmer
+# Decrement number two places in front, remove lowest node and tally its sum, repeat
 
+dat <- read_csv("data/day8.txt", col_names = "x")
+dat <- as.numeric(strsplit(dat$x, " ")[[1]])
 total <- 0
-x <- practice
+
+# x <- practice ## for calibrating
+x <- dat ## for real, and I'm too lazy to wrap this in a function
+
 first_zero_index <- first(which(x == 0))
+
 # is this the right end condition?
 while(first_zero_index + 1 + x[first_zero_index + 1] <= length(x)){
 
@@ -51,17 +57,4 @@ total <- total + sum_metas(x[first_zero_index:length(x)])
 x <- c(x[1:(first_zero_index - 1)],
        x[(first_zero_index + 2 + x[(first_zero_index + 1)]):length(x)])
 }
-# ... abort, this seems like a dead end for part 2 anyway
 
-## Part 1, take 2
-
-ans <- character(length(x))
-for(i in seq_along(x)){
-  if(x[i] != 0){
-   ans[i:(i + 1)] <- c("kids", "val_count")
-   i <- i + 1
-  } else {
-    v_count <- 
-  }
-  
-}
