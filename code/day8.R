@@ -58,3 +58,36 @@ x <- c(x[1:(first_zero_index - 1)],
        x[(first_zero_index + 2 + x[(first_zero_index + 1)]):length(x)])
 }
 
+## Part 2 ---------------------
+
+# Create a function that actually produces a nested list?
+
+list(kids = 2, metas = 3)
+
+make_node <- function(x){
+  kid_count <- x[1]
+  meta_count <- x[2]
+  len <- 2
+  
+  kids <- NA # kinda clunky can I remove?
+  
+  kid_counter <- kid_count
+  while(kid_counter > 0){
+    kid_counter <- kid_counter - 1
+    kids <- list(kids, make_node(x))
+    len <- len + 2 + kids[[length(kids)]]$meta_count
+  }
+  
+  metas <- NA
+  if(meta_count > 0){
+    remainder <- x[(len + 1):length(x)]
+    metas <- remainder[meta_count]
+  }
+  
+    
+  return(list(kid_count = kid_count,
+              kids = kids,
+              meta_count = meta_count,
+              metas = metas,
+              length = length))
+}
