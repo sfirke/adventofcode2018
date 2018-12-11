@@ -1,5 +1,5 @@
 library(pacman)
-p_load(readr, dplyr)
+p_load(readr, dplyr, purrr)
 
 practice <- "2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2"
 practice <- as.numeric(strsplit(practice, " ")[[1]])
@@ -64,30 +64,74 @@ x <- c(x[1:(first_zero_index - 1)],
 
 list(kids = 2, metas = 3)
 
-make_node <- function(x){
+parse_nodes <- function(x){
   kid_count <- x[1]
   meta_count <- x[2]
+  
+  print(paste0("kid_count: ", kid_count))
+  print(paste0("meta_count: ", meta_count))
+  
   len <- 2
   
-  kids <- NA # kinda clunky can I remove?
-  
-  kid_counter <- kid_count
-  while(kid_counter > 0){
-    kid_counter <- kid_counter - 1
-    kids <- list(kids, make_node(x))
-    len <- len + 2 + kids[[length(kids)]]$meta_count
-  }
-  
   metas <- NA
-  if(meta_count > 0){
-    remainder <- x[(len + 1):length(x)]
-    metas <- remainder[meta_count]
+  
+  # if no kids, grab metas and remove them
+  if(kid_count == 0){
+    metas <- x[3:(2 + meta_count)]
+    print(paste0("metas: ", paste0(metas, collapse = ", ")))
+    x <- x[(2 + meta_count + 1):length(x)]
+  } else {
+    kids <- list()
+    kid_counter <- kid_count
+    x <- x[3:length(x)]
+    while(kid_counter > 0){
+      kid_counter <- kid_counter - 1
+      kids <- c(kids, list(parse_nodes(x)))
+      len <- len + kids[[length(kids)]]$meta_count
+      x <- x[(len + 1):length(x)]
+    }
+    
+    if(meta_count > 0){
+      metas <- x[1:meta_count]
+      print(paste0("metas: ", paste0(metas, collapse = ", ")))
+    }
   }
   
-    
+  if(!exists("kids")){
+    kids <- NA
+  }
+  
   return(list(kid_count = kid_count,
               kids = kids,
               meta_count = meta_count,
               metas = metas,
-              length = length))
+              length = len))
 }
+
+# A nested list tree!
+y <- parse_nodes(practice)
+
+# function to calculate the sum per the instructions
+
+sum_node_worth <- function(x){
+  # if terminal node, return sum of meta values
+  if(x$kid_count == 0){
+    return(sum(x$metas))
+  } else {
+    valid_metas <- x$metas[x$metas <= length(x$kids)]
+    if(length(valid_metas) == 0){ # abort if only out of bounds indices
+      return(0)
+    }
+    return( # get recursive
+      sum(
+        map_dbl(valid_metas, function(index) sum_node_worth(x$kids[[index]]))
+      )
+    )
+  }
+}
+
+sum_node_worth(y) # 66, checks out
+
+dat %>%
+  parse_nodes() %>%
+  sum_node_worth()
