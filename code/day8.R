@@ -67,9 +67,7 @@ list(kids = 2, metas = 3)
 parse_nodes <- function(x){
   kid_count <- x[1]
   meta_count <- x[2]
-  
-  print(paste0("kid_count: ", kid_count))
-  print(paste0("meta_count: ", meta_count))
+  print(paste0("kid_count = ", kid_count, "; meta_count = ", meta_count))
   
   len <- 2
   
@@ -78,7 +76,7 @@ parse_nodes <- function(x){
   # if no kids, grab metas and remove them
   if(kid_count == 0){
     metas <- x[3:(2 + meta_count)]
-    print(paste0("metas: ", paste0(metas, collapse = ", ")))
+
     x <- x[(2 + meta_count + 1):length(x)]
   } else {
     kids <- list()
@@ -93,19 +91,19 @@ parse_nodes <- function(x){
     
     if(meta_count > 0){
       metas <- x[1:meta_count]
-      print(paste0("metas: ", paste0(metas, collapse = ", ")))
     }
   }
   
   if(!exists("kids")){
     kids <- NA
   }
-  
+  rm(len)
+  #trying to solve memory problem
   return(list(kid_count = kid_count,
               kids = kids,
               meta_count = meta_count,
-              metas = metas,
-              length = len))
+       #       len = len,
+              metas = metas))
 }
 
 # A nested list tree!
@@ -132,6 +130,10 @@ sum_node_worth <- function(x){
 
 sum_node_worth(y) # 66, checks out
 
-dat %>%
-  parse_nodes() %>%
-  sum_node_worth()
+# stack overflow :-(
+z <- dat %>%
+  parse_nodes()
+
+
+# Brutal.  Can I make a leaner recursive function?
+
