@@ -63,14 +63,14 @@ x <- c(x[1:(first_zero_index - 1)],
 # Create a function that actually produces a nested list?
 
 i <- 1
-x <- practice
+# x <- practice
+x <- dat
 parse_nodes <- function(){
   if(i > length(x)) return()
   kid_count <- x[i]
   i <<- i + 1
   meta_count <- x[i]
   i <<- i + 1
-  
   metas <- NA
   
   # if no kids, grab metas and remove them
