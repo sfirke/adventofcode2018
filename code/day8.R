@@ -63,8 +63,8 @@ x <- c(x[1:(first_zero_index - 1)],
 # Create a function that actually produces a nested list?
 
 i <- 1
-x <- practice
-# x <- dat
+# x <- practice
+x <- dat
 parse_nodes <- function(){
   if(i > length(x)) return()
   kid_count <- x[i]
@@ -73,35 +73,27 @@ parse_nodes <- function(){
   i <<- i + 1
   metas <- NA
   
-  # if no kids, grab metas and remove them
-  if(kid_count == 0){
-    metas <- x[i:(i + meta_count - 1)]
-    i <<- i + meta_count
-  } else {
-    kids <- list()
-    kid_counter <- kid_count
-    while(kid_counter > 0){
+  kids <- integer()
+  kid_counter <- kid_count
+  while(kid_counter > 0){
       kid_counter <- kid_counter - 1
-      kids <- c(kids, list(parse_nodes()))
+      kids <- append(kids, parse_nodes())
     }
     
-    if(meta_count > 0){
-      metas <- x[i:(i + meta_count - 1)]
-   #   i <<- i + meta_count ## maybe?
-    }
+    metas <- x[i:(i + meta_count - 1)]
+    i <<- i + meta_count
+  
+  # if no kids, grab metas and remove them
+  if(kid_count == 0){
+    sum(metas)
+  } else{
+    sum(kids[metas], na.rm = TRUE)
   }
   
-  if(!exists("kids")){
-    kids <- NA
-  }
-  return(list(kid_count = kid_count,
-              kids = kids,
-              meta_count = meta_count,
-              metas = metas))
 }
 
 # A nested list tree!
-y <- parse_nodes()
+parse_nodes()
 
 # function to calculate the sum per the instructions
 
@@ -130,4 +122,5 @@ z <- dat %>%
 
 
 # Brutal.  Can I make a leaner recursive function?
+
 
