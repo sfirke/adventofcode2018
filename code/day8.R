@@ -17,23 +17,6 @@ practice <- as.numeric(strsplit(practice, " ")[[1]])
 # 33 + 101 + 1 + 1 + 2 = 138
 
 
-# Helper function
-# Takes arbitrary length vector of #s beginning with zero, returns sum
-# 0 3 10 11 12 1 1 would return 33 1 1
-zero_trimmer <- function(x){
-  end_sum <- x[2] + 2
-  c(
-    sum(x[3:end_sum]),
-  x[(end_sum + 1):length(x)]
-    )
-}
-
-# Takes zero-beginning vector, sums the relevant meta values
-sum_metas <- function(x){
-  end_sum <- x[2] + 2
-  sum(x[3:end_sum])
-}
-
 # Find first zero
 # Decrement number two places in front, remove lowest node and tally its sum, repeat
 
@@ -46,16 +29,16 @@ x <- dat ## for real, and I'm too lazy to wrap this in a function
 
 first_zero_index <- first(which(x == 0))
 
-# is this the right end condition?
+# end condition - it errors, but at the right answer
 while(first_zero_index + 1 + x[first_zero_index + 1] <= length(x)){
-
-first_zero_index <- first(which(x == 0))
-if(first_zero_index > 1){
-  x[first_zero_index - 2] <- x[first_zero_index - 2] - 1
-}
-total <- total + sum_metas(x[first_zero_index:length(x)])
-x <- c(x[1:(first_zero_index - 1)],
-       x[(first_zero_index + 2 + x[(first_zero_index + 1)]):length(x)])
+  
+  first_zero_index <- first(which(x == 0))
+  if(first_zero_index > 1){
+    x[first_zero_index - 2] <- x[first_zero_index - 2] - 1
+  }
+  total <- total + sum_metas(x[first_zero_index:length(x)])
+  x <- c(x[1:(first_zero_index - 1)],
+         x[(first_zero_index + 2 + x[(first_zero_index + 1)]):length(x)])
 }
 
 ## Part 2 ---------------------
@@ -84,7 +67,7 @@ parse_nodes <- function(){
     
     if(meta_count > 0){
       metas <- x[i:(i + meta_count - 1)]
-      i <<- i + meta_count
+      i <<- i + meta_count # having this line commented out cost me hours :-/
     }
   }
   
@@ -97,9 +80,11 @@ parse_nodes <- function(){
               metas = metas))
 }
 
-# A nested list tree!
+# A nested list tree!  It works!
 x <- practice
 y <- parse_nodes()
+
+# real data:
 i <- 1
 x <- dat
 actual <- parse_nodes()
