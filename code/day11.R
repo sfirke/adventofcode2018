@@ -31,8 +31,8 @@ set_power_levels <- function(serial){
 powers <- set_power_levels(3999)
 
 # crawl and get best 3x3 grid
-sum_zone <- function(x, y){
-  sum(powers[x:(x + 2), y:(y + 2)])
+sum_zone <- function(x, y, grid_size = 3){
+  sum(powers[x:(x + grid_size - 1), y:(y + grid_size - 1)])
 }
 
 max_zone <- 0
@@ -45,3 +45,23 @@ for(j in 1:298){
     }
   }
 }
+
+max_coords
+
+# Part 2
+max_zone <- 0
+max_coords <- c(0, 0, 0)
+
+for(j in 1:298){
+  for(k in 1:298){
+    max_valid_grid <- min(c(301 - j), (301 - k))
+    for(grid_n in max_valid_grid:1){
+      if(sum_zone(j, k, grid_n) > max_zone){
+        max_zone <- sum_zone(j, k, grid_n)
+        max_coords <- c(j, k, grid_n)
+      }
+    }
+  }
+}
+
+max_coords
