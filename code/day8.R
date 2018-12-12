@@ -62,52 +62,49 @@ x <- c(x[1:(first_zero_index - 1)],
 
 # Create a function that actually produces a nested list?
 
-list(kids = 2, metas = 3)
-
-parse_nodes <- function(x){
-  kid_count <- x[1]
-  meta_count <- x[2]
-  print(paste0("kid_count = ", kid_count, "; meta_count = ", meta_count))
-  
-  len <- 2
+i <- 1
+x <- practice
+parse_nodes <- function(){
+  if(i > length(x)) return()
+  kid_count <- x[i]
+  i <<- i + 1
+  meta_count <- x[i]
+  i <<- i + 1
   
   metas <- NA
   
   # if no kids, grab metas and remove them
   if(kid_count == 0){
-    metas <- x[3:(2 + meta_count)]
-
-    x <- x[(2 + meta_count + 1):length(x)]
+    metas <- x[i:(i + meta_count - 1)]
+    i <<- i + meta_count
   } else {
     kids <- list()
     kid_counter <- kid_count
-    x <- x[3:length(x)]
     while(kid_counter > 0){
       kid_counter <- kid_counter - 1
-      kids <- c(kids, list(parse_nodes(x)))
-      len <- len + kids[[length(kids)]]$meta_count
-      x <- x[(len + 1):length(x)]
+      kids <- c(kids, list(parse_nodes()))
+      # len <- 2 + len + kids[[length(kids)]]$meta_count
+      # i <<- i + len
+     # i <<- i + kids[[length(kids)]]$meta_count # try w/o plus one?
     }
     
     if(meta_count > 0){
-      metas <- x[1:meta_count]
+      metas <- x[i:(i + meta_count - 1)]
+   #   i <<- i + meta_count ## maybe?
     }
   }
   
   if(!exists("kids")){
     kids <- NA
   }
-  rm(len)
-  #trying to solve memory problem
   return(list(kid_count = kid_count,
               kids = kids,
               meta_count = meta_count,
-       #       len = len,
               metas = metas))
 }
 
 # A nested list tree!
-y <- parse_nodes(practice)
+y <- parse_nodes()
 
 # function to calculate the sum per the instructions
 
