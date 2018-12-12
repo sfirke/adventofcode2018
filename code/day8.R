@@ -63,8 +63,8 @@ x <- c(x[1:(first_zero_index - 1)],
 # Create a function that actually produces a nested list?
 
 i <- 1
-# x <- practice
-x <- dat
+x <- practice
+# x <- dat
 parse_nodes <- function(){
   if(i > length(x)) return()
   kid_count <- x[i]
@@ -83,9 +83,6 @@ parse_nodes <- function(){
     while(kid_counter > 0){
       kid_counter <- kid_counter - 1
       kids <- c(kids, list(parse_nodes()))
-      # len <- 2 + len + kids[[length(kids)]]$meta_count
-      # i <<- i + len
-     # i <<- i + kids[[length(kids)]]$meta_count # try w/o plus one?
     }
     
     if(meta_count > 0){
