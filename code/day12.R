@@ -7,8 +7,8 @@ init_state <- "#..#.#..##......###...###" %>%
   strsplit(., "") %>%
   unlist()
 
-padding_l <- 100
-padding_r <- 100
+padding_l <- 10
+padding_r <- 50
 init_state <- c(rep(".", padding_l), init_state, rep(".", padding_r))
 
 grow_rules <- read_csv("data/day12_sample.txt", col_names = FALSE) %>%
@@ -33,7 +33,7 @@ apply_growth_single <- function(i){
 
 # Try it
 apply_growth_all <- function(){
-  c(rep(".", 2), sapply(3:(length(init_state) - 2), apply_growth), rep(".", 2))
+  c(rep(".", 2), sapply(3:(length(init_state) - 2), apply_growth_single), rep(".", 2))
 }
 
 # Now loop for generations
@@ -50,7 +50,7 @@ init_state <- "..#..####.##.####...#....#######..#.#..#..#.#.#####.######..#.#.#
   strsplit(., "") %>%
   unlist()
 
-padding_l <- 100
+padding_l <- 10
 padding_r <- 100
 init_state <- c(rep(".", padding_l), init_state, rep(".", padding_r))
 
@@ -81,22 +81,22 @@ init_state <- "..#..####.##.####...#....#######..#.#..#..#.#.#####.######..#.#.#
   strsplit(., "") %>%
   unlist()
 
-padding_l <- 50
+padding_l <- 10
 padding_r <- 150
 init_state <- c(rep(".", padding_l), init_state, rep(".", padding_r))
 
 # They seem to migrate right-ward
-hit_sums <- numeric(1000)
-for(g in 1:1000){
+hit_sums <- numeric(800)
+for(g in 1:800){
   init_state <- apply_growth_all()
   hit_sums[g] <- sum(
-    which(init_state == "#") - padding_l
+    which(init_state == "#") - padding_l - 1
   )
   
 }
 
 plot(hit_sums) # hey it converges to a couple of values.  What are they?
-tail(hit_sums, 50) # repeating over and over, 3891, 4278, 4275
+tail(hit_sums, 50) # repeating over and over, 5091 5628 5625
 
 # Would it be different with a different size padding?  I figured the padding in part 1 goes on indefinitely
 
@@ -104,15 +104,14 @@ init_state <- "..#..####.##.####...#....#######..#.#..#..#.#.#####.######..#.#.#
   strsplit(., "") %>%
   unlist()
 
-padding_l <- 50
+padding_l <- 10
 padding_r <- 200
 init_state <- c(rep(".", padding_l), init_state, rep(".", padding_r))
 
-# They seem to migrate right-ward
-hit_sums_200r <- numeric(1000)
-for(g in 1:1000){
+hit_sums_200r <- numeric(800)
+for(g in 1:800){
   hit_sums_200r[g] <- sum(
-    which(init_state == "#") - padding_l
+    which(init_state == "#") - padding_l - 1
   )
   init_state <- apply_growth_all()
 }
@@ -133,16 +132,13 @@ hit_sums[130:150] - lag(hit_sums[130:150]) # it's 46
 # So assume this +46 series continues for 50 billion if there was infinite growth allowed on the right
 
 options(scipen = 999)
-hit_sums[150] + 46 * (50000000000 - 150)
 
-# will only work once function has become linear at > 130
+# will only work once function has become linear at ~ 130, let's validate while change is linear
 extend <- function(gens){
   hit_sums[130] + 46 * (gens - 130)
 }
 
-extend(140) == hit_sums[140] # yep that works
 extend(150) == hit_sums[150]
-extend(50000000000) # too low: 2299999997706
+extend(140) == hit_sums[140]
 
-# off by one error?
-extend(50000000001) # not right either: 2299999997752
+extend(50000000000) 
