@@ -117,9 +117,9 @@ for(g in 1:800){
 }
 
 plot(hit_sums_200r) # now it converges later
-tail(hit_sums_200r, 50) # three repeating values are 5091, 5628, 5625
+tail(hit_sums_200r, 50) # three repeating values are 6291 6978 6975
 
-# There's an interval where it increases constantly, by 46 - presumbly before it hits the right-most boundary
+# There's an interval where it increases constantly - presumbly before it hits the right-most boundary
 # And that interval is longer in the instance where I've given more right padding - so this would be the true unbounded growth rate
 plot(hit_sums_200r[130:150])
 hit_sums_200r[130:150]
@@ -141,4 +141,4 @@ extend <- function(gens){
 extend(150) == hit_sums[150]
 extend(140) == hit_sums[140]
 
-extend(50000000000) 
+extend(50000000000) # answer: 2300000000006
