@@ -3,12 +3,14 @@ library(pacman)
 e1_place <- 1
 e2_place <- 2
 
-board <- c(3, 7)
+board <- as.numeric(rep(NA_integer_, 15000000))
+board[1:2] <- c(3, 7)
+board_max_place <- 2
 
 get_new_elf_place <- function(current, num_moves){
-  num_moves <- num_moves %% length(board)
-  if((current + num_moves) >= length(board)){
-    num_moves <- num_moves - (length(board) - current) - 1
+  num_moves <- num_moves %% board_max_place
+  if((current + num_moves) >= board_max_place){
+    num_moves <- num_moves - (board_max_place - current) - 1
     current <- 1
   }
   current + num_moves + 1
@@ -16,11 +18,13 @@ get_new_elf_place <- function(current, num_moves){
 
 update_board <- function(rep1, rep2){
   total <- rep1 + rep2
-  if(nchar(total) == 2){
-    board <<- c(board, as.numeric(substr(total, 1, 1)), as.numeric(substr(total, 2, 2)))
+  digits_added <- nchar(total)
+  if(digits_added == 2){
+    board[(board_max_place + 1):(board_max_place + 2)] <<- as.numeric(c(substr(total, 1, 1), substr(total, 2, 2)))
   } else{
-    board <<- c(board, total)
+    board[board_max_place + 1] <<- total
   }
+  board_max_place <<- board_max_place + digits_added
 }
 
 for(i in 1:077201 + 10){
@@ -54,17 +58,21 @@ boundary # yep 2018
 # I guess growing the board vector with c() ... will be quite inefficient but again, don't want to refactor to
   # preallocate "board" with NA and keep an index of where the technical end of the vector is at any moment 
 
+ptm <- proc.time()
 for(i in 1:10000000){
   update_board(board[e1_place], board[e2_place])
   e1_place <- get_new_elf_place(e1_place, board[e1_place])
   e2_place <- get_new_elf_place(e2_place, board[e2_place])
 }
+proc.time() - ptm
+
 
 target <- 077201
 boundary <- numeric(0)
-for(j in 1:length(board)){
+for(j in 1:board_max_place){
   if(paste0(board[j:(j+nchar(target)-1)], collapse = "") == target){
     boundary <- j - 1
+    print("success!")
     break
   }
 }
