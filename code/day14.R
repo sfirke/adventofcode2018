@@ -59,7 +59,7 @@ boundary # yep 2018
   # preallocate "board" with NA and keep an index of where the technical end of the vector is at any moment 
 
 ptm <- proc.time()
-for(i in 1:10000000){
+for(i in 1:40000000){
   update_board(board[e1_place], board[e2_place])
   e1_place <- get_new_elf_place(e1_place, board[e1_place])
   e2_place <- get_new_elf_place(e2_place, board[e2_place])
@@ -76,4 +76,5 @@ for(j in 1:board_max_place){
     break
   }
 }
-boundary
+boundary # too high:20357549
+boundary - 1 # lol it was an off-by-one error ;)
